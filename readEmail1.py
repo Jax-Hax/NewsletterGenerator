@@ -3,6 +3,7 @@ import base64
 import json
 import re
 import time
+from functions import *
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -12,12 +13,7 @@ import requests
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
-
-
-def main():
-    """Shows basic usage of the Gmail API.
-    Lists the user's Gmail labels.
-    """
+def auth():
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -35,40 +31,35 @@ def main():
         # Save the credentials for the next run
         with open('token.json', 'w') as token:
             token.write(creds.to_json())
-
+    return build('gmail', 'v1', credentials=creds)
+def getEmails():
+    service = auth()
     try:
-        # Call the Gmail API
-        service = build('gmail', 'v1', credentials=creds)
         results = service.users().messages().list(userId='me',labelIds=['INBOX'], q="is:unread").execute()
-        messages = results.get('messages',[]);
+        messages = results.get('messages',[])
+        emails = []
         if not messages:
-            print('No new messages.')
+            return []
         else:
-            message_count = 0
             for message in messages:
                 msg = service.users().messages().get(userId='me', id=message['id']).execute()                
                 email_data = msg['payload']['headers']
                 for values in email_data:
                     name = values['name']
                     if name == 'From':
-                        from_name= values['value']                
                         for part in msg['payload']['parts']:
                             try:
                                 data = part['body']["data"]
                                 byte_code = base64.urlsafe_b64decode(data)
-
                                 text = byte_code.decode("utf-8")
-                                print ("This is the message: "+ str(text))
-
+                                emails.append(str(text))
                                 # mark the message as read (optional)
-                                msg  = service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()                                                       
+                                # msg  = service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()                                                       
                             except BaseException as error:
+                                print(error)
                                 pass                            
+            return emails
 
-    except HttpError as error:
+    except Exception as error:
         # TODO(developer) - Handle errors from gmail API.
         print(f'An error occurred: {error}')
-
-
-if __name__ == '__main__':
-    main()
