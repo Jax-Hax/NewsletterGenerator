@@ -45,8 +45,7 @@ def getEmails():
                 msg = service.users().messages().get(userId='me', id=message['id']).execute()                
                 email_data = msg['payload']['headers']
                 for values in email_data:
-                    name = values['name']
-                    if name == 'From':
+                    if values['name'] == 'From':
                         for part in msg['payload']['parts']:
                             try:
                                 data = part['body']["data"]

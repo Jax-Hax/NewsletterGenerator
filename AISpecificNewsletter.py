@@ -1,18 +1,15 @@
 from functions import *
 from readEmail1 import *
 # Newsletters
-# sign in with gmail
-
-# fetch todays emails
-
-# check the email and run different things depending on it, so for TLDR say remove sponsors, summarize everything, include the link (with normal code do this yourself)
-# AI Papers
-# https://ai.papers.bar/papers/recent/
 emails = getEmails()
 for email in emails:
     prompt = f"give me the most important points from this email, key insights and quotes. Do not introduce yourself or do anything else, only write: Key insights: and key quotes:. Here is the email: {email}"
     response = ask(prompt)
     print(response)
+# check the email and run different things depending on it, so for TLDR say remove sponsors, summarize everything, include the link (with normal code do this yourself)
+# AI Papers
+# https://ai.papers.bar/papers/recent/
+
 # Articles
 # techcrunch
 #techxplore = rss_scrape("https://techxplore.com/rss-feed/machine-learning-ai-news/")
