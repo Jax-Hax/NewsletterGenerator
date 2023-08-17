@@ -10,3 +10,5 @@ from functions import *
 
 # Articles
 # techcrunch
+techxplore = scrape_techxplore()
+# maybe ai youtube channels latest videos
